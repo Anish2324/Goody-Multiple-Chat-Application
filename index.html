@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rust WebSocket Chat</title>
+    <link rel="icon" href="/meetme.png">
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: rgb(49, 4, 86);
+           
+        }
+        h1{
+            width: 80%;
+            height: auto;
+            border: 1px solid gray;
+            background-color: aqua;
+        }
+        #chat-box {
+            width: 80%;
+            height: 500px;
+            border: 1px solid black;
+            overflow-y: auto;
+            background: white;
+            margin: auto;
+            padding: 2px;
+            text-align: left;
+            display:flex;
+            flex-direction: column;
+            background: url('/whatsapp.png') no-repeat center center;
+            background-size: cover;
+            
+        }
+        input {
+            width: 70%;
+            padding: 10px;
+            margin: 10px;
+        
+        }
+        button {
+            padding: 10px;
+            background: blue;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <img src="/meetme.png" width="50px" height="50" style="border: 1px;">
+    <center>
+    <h1><span> Goody Chat App</span></h1>
+    
+    <div id="chat-box"></div>
+    <input type="text" id="messageInput" placeholder="Type a message..." />
+    <button onclick="sendMessage()">Send</button>
+    </center>
+
+    <script>
+       const ws = new WebSocket("ws://127.0.0.1:8080/chat");
+
+// Ask for a username when the user connects
+const username = prompt("Enter your username:", "User" + Math.floor(Math.random() * 1000));
+
+ws.onopen = function() {
+    console.log("Connected to WebSocket server!");
+};
+
+ws.onmessage = function(event) {
+    let chatBox = document.getElementById("chat-box");
+    let msg = document.createElement("p");
+
+    // Display the received message
+    msg.innerHTML = `<strong>${event.data}</strong>`; // Now displays "User1: Hello!"
+    chatBox.appendChild(msg);
+    chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll
+};
+
+function sendMessage() {
+    let input = document.getElementById("messageInput");
+    if (input.value.trim() !== "") {
+        ws.send(username + ": " + input.value); // Send message with username
+        input.value = ""; // Clear input after sending
+    }
+}
+
+// 🔹 Send message when Enter key is pressed
+document.getElementById("messageInput").addEventListener("keypress", function(event) {
+    if (event.key === "Enter") {
+        sendMessage();
+    }
+});
+
+    </script>
+    
+
+</body>
+</html>
